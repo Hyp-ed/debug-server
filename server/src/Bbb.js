@@ -6,7 +6,7 @@
  *
  * Description:   Compiles & runs the HYPED binary (./hyped) as a child_process and handles the connection
  *
- * Last Modified: Saturday, 15th February 2020 4:59:24 pm
+ * Last Modified: Thursday, 27th February 2020 11:42:25 pm
  * Modified By:   Paul Martin
  */
 const path = require('path');
@@ -20,6 +20,8 @@ class Bbb {
   _running = false;
   _compiling = false;
 
+  bin_path = path.join(HYPED_PATH, './hyped');
+
   /**
    * A wrapper around running the make command
    *
@@ -28,7 +30,6 @@ class Bbb {
    * @param {callback} exitCallback - Fired when process exits
    * @param {callback} errorCallback - Pipeline for stderr
    */
-  // TODO: check wheter successful (was binary created?)
   compile(params, dataCallback, exitCallback, errorCallback) {
     const make = spawn('sh ./setup.sh && make', params, {
       cwd: HYPED_PATH,
@@ -41,6 +42,7 @@ class Bbb {
 
     make.on('exit', code => {
       this._connected = false;
+      console.log('** Compilation terminated');
       exitCallback();
       // if not exited gracefully
       if (code != 0) errorCallback(`Child process exited with code ${code}`);
@@ -57,11 +59,11 @@ class Bbb {
    * @param {callback} errorCallback - Pipeline for stderr
    */
   run(flags, debug_level, dataCallback, exitCallback, errorCallback) {
-    if (!self.doesCompiledBinExist()) return false;
+    if (!this.doesCompiledBinExist()) return false;
 
     const params = flags.concat([`--debug=${debug_level}`]);
 
-    this.child = spawn('./hyped', params, { cwd: HYPED_PATH });
+    this.child = spawn(this.bin_path, params, { cwd: HYPED_PATH });
     this.child.stdout.setEncoding('utf8');
     this._connected = true;
 
@@ -81,8 +83,13 @@ class Bbb {
     this.child.kill('SIGINT');
   }
 
+  binLastModified() {
+    if (!this.doesCompiledBinExist()) return null;
+    return fs.statSync(this.bin_path).mtime;
+  }
+
   doesCompiledBinExist() {
-    return fs.existsSync(path.join(HYPED_PATH, './hyped'));
+    return fs.existsSync(this.bin_path);
   }
 
   isRunning() {

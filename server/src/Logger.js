@@ -4,7 +4,7 @@
  * File Created:  Saturday, 9th November 2019 1:48:35 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Saturday, 8th February 2020 3:40:53 pm
+ * Last Modified: Thursday, 27th February 2020 11:57:01 pm
  * Modified By:   Paul Martin
  */
 
@@ -26,14 +26,18 @@ class Logger {
   }
 
   _genFilename() {
+    function twoDigit(x) {
+      return ('0' + x).slice(-2);
+    }
+
     const datetime = new Date();
     const dt = {
-      year: datetime.getFullYear(),
-      mon: datetime.getMonth() + 1,
-      day: datetime.getDate(),
-      hour: datetime.getHours(),
-      min: datetime.getMinutes(),
-      sec: datetime.getSeconds()
+      year: twoDigit(datetime.getFullYear()),
+      mon: twoDigit(datetime.getMonth() + 1),
+      day: twoDigit(datetime.getDate()),
+      hour: twoDigit(datetime.getHours()),
+      min: twoDigit(datetime.getMinutes()),
+      sec: twoDigit(datetime.getSeconds())
     };
     return `log-${dt.year}${dt.mon}${dt.day}${dt.hour}${dt.min}${dt.sec}.txt`;
   }
@@ -43,13 +47,13 @@ class Logger {
   }
 
   addContent(content) {
-    fs.appendFile(`${this.folder}/${this.filename}`, content, err => {
+    fs.appendFile(`${LOG_DIR}/${this.filename}`, content, err => {
       if (err) throw err;
     });
   }
 
   getFullHistory() {
-    return fs.readFileSync(`${this.folder}/${this.filename}`);
+    return fs.readFileSync(`${LOG_DIR}/${this.filename}`);
   }
 }
 

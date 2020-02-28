@@ -4,7 +4,7 @@
  * File Created:  Thursday, 7th November 2019 6:48:08 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Monday, 10th February 2020 6:37:51 pm
+ * Last Modified: Thursday, 27th February 2020 8:15:12 pm
  * Modified By:   Paul Martin
  */
 
@@ -20,13 +20,13 @@ class ExecParser {
     const lines = this.queue.split('\n');
     const lastLine = lines.pop();
     this.queue = lastLine;
-    return lines.map(parse_line);
+    return lines.map(this.parse_line);
   }
 
   parseRest() {
     const lines = this.queue.split('\n');
     this.queue = [];
-    return lines.map(parse_line);
+    return lines.map(this.parse_line);
   }
 
   addToQueue(data) {
@@ -41,6 +41,10 @@ class ExecParser {
   parse_line(str) {
     //                h     m     s     ms     dbg  [submodule]   log
     const regex = /(\d{2}:\d{2}:\d{2}\.\d{3}) (\w*)\[([\w-]*)\]: (.*)/;
+
+    const match = str.match(regex);
+
+    if (match == null) return { line: str }; // Couldn't parse
 
     const [, time, debug_mode, submodule, debug_output] = str.match(regex);
 

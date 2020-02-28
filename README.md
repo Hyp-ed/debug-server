@@ -11,7 +11,7 @@
 
 2. Clone this repo
 
-3. Run `./setup.sh` in the repo's base folder \
+3. Run `./setup.sh` in the repo's base folder _(Internet connection required)_ \
    This will setup the subrepo and install the node dependencies.
 
 4. To **start the server**, go into the `server` sub-directory and type `npm start`
@@ -88,9 +88,16 @@ Error messages may be split into multiple TCP messages
 ```JSON
 {
     "msg": "error",
+    "type": <type>,
     "payload": "error_message"
 }
 ```
+
+**Error types:**
+
+- `"server_error"`
+- `"compile_error"`
+- `"execution_error"`
 
 ## Console Data
 
@@ -101,7 +108,7 @@ Error messages may be split into multiple TCP messages
 }
 ```
 
-**Types of data:**
+**Data types:**
 
 - Parsed line(s) \
    e.g.
@@ -135,7 +142,8 @@ Error messages may be split into multiple TCP messages
 ```JSON
 {
     "msg": "completed",
-    "task": "command_name"
+    "task": "command_name",
+    "success": true|false
 }
 ```
 
@@ -145,7 +153,8 @@ E.g. when compiling the binary, the TCP response would be
 
 ```JSON
 {
-    "msg": "completed",
-    "task": "compile_bin"
+    "msg": "terminated",
+    "task": "compile_bin",
+    "success": true
 }
 ```
