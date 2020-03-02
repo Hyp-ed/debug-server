@@ -48,8 +48,7 @@ Run the `make` command with params / flags:
 
 **Possible responses:**
 
-- [Errors](#errors)
-- [Completion](#completion)
+- [Termination](#termination)
 
 ## Executing the binary
 
@@ -72,7 +71,7 @@ Execute with custom flags and debug-level (default=3):
 **Possible responses:**
 
 - [Console Data](#console-data) -> Parsed lines
-- [Completion](#completion)
+- [Termination](#termination)
 
 ## Stopping execution
 
@@ -82,7 +81,7 @@ Execute with custom flags and debug-level (default=3):
 
 **Possible responses:**
 
-Triggers the [Completion](#completion) response of the [binary execution](#executing-the-binary)
+Triggers the [Termination](#termination) response of the [binary execution](#executing-the-binary)
 
 # Possible TCP responses
 
@@ -103,8 +102,6 @@ Error messages may be split into multiple TCP messages
 **Error types:**
 
 - `"server_error"`
-- `"compile_error"`
-- `"execution_error"`
 
 ## Console Data
 
@@ -144,7 +141,7 @@ Error messages may be split into multiple TCP messages
 - String \
    _(Possible but not yet implemented)_
 
-## Completion
+## Termination
 
 ```JSON
 {
@@ -162,6 +159,7 @@ E.g. when compiling the binary, the TCP response would be
 {
     "msg": "terminated",
     "task": "compile_bin",
-    "success": true
+    "success": true,
+    "payload": "error_message(s)"
 }
 ```

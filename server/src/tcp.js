@@ -6,7 +6,7 @@
  *
  * Description:   Handles websocket requests and responses using socket.io
  *
- * Last Modified: Monday, 2nd March 2020 7:52:20 pm
+ * Last Modified: Monday, 2nd March 2020 8:20:23 pm
  * Modified By:   Paul Martin
  */
 
@@ -111,9 +111,7 @@ function compile_bin(socket, make_params) {
       if (secsSinceCompiled <= 1) successful = true;
     }
 
-    // TODO: move error messages into terminated-msg
-    sendTerminated(socket, 'compile_bin', successful);
-    sendErrorMsg(socket, error_collection);
+    sendTerminated(socket, 'compile_bin', successful, error_collection);
   }
 
   function errorHandler(err) {
@@ -205,11 +203,12 @@ function sendData(socket, payload) {
   tcpSend(socket, data);
 }
 
-function sendTerminated(socket, taskName, success) {
+function sendTerminated(socket, taskName, success, payload = '') {
   const data = JSON.stringify({
     msg: 'terminated',
     task: taskName,
-    success: success || true
+    success: success || true,
+    payload
   });
 
   tcpSend(socket, data);
