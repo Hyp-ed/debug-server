@@ -4,7 +4,7 @@
  * File Created:  Thursday, 7th November 2019 6:48:08 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Thursday, 27th February 2020 8:15:12 pm
+ * Last Modified: Monday, 2nd March 2020 7:49:41 pm
  * Modified By:   Paul Martin
  */
 
@@ -53,18 +53,11 @@ class ExecParser {
     return {
       line: str,
       time: time,
-      debug_mode: debug_mode,
+      log_type: debug_mode,
       debug_level: debug_level,
       submodule: submodule,
       log: debug_output
     };
-  }
-}
-
-class CompileParser extends ExecParser {
-  parse_line(str) {
-    //                h     m     s     ms     dbg  [submodule]   log
-    const regex = /(\d{2}:\d{2}:\d{2}\.\d{3}) (\w*)\[([\w-]*)\]: (.*)/;
   }
 }
 
