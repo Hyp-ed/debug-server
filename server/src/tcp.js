@@ -6,7 +6,7 @@
  *
  * Description:   Handles websocket requests and responses using socket.io
  *
- * Last Modified: Friday, 28th February 2020 12:08:58 am
+ * Last Modified: Monday, 2nd March 2020 7:52:20 pm
  * Modified By:   Paul Martin
  */
 
@@ -75,9 +75,9 @@ function run_bin(socket, payload) {
     sendTerminated(socket, 'run_bin', true);
   }
 
-  function errorHandler(err) {
-    sendErrorMsg(socket, 'execution_error', err.toString());
-  }
+  // Don't differentiate between stdout and stderr
+  // DBG logs are sent through stderr and errors are sent through stdout (also parsable)
+  errorHandler = outputHandler;
 
   console.log('** Executing binary');
   bbb.run(
@@ -96,7 +96,6 @@ function compile_bin(socket, make_params) {
     return;
   }
 
-  const logger = new Logger();
   let error_collection = '';
 
   function outputHandler(data) {
@@ -104,6 +103,7 @@ function compile_bin(socket, make_params) {
   }
 
   function exitHandler(data, err) {
+    // TODO: fix - successful even if not compiled
     // Check if binary was created
     let successful = false;
     if (bbb.doesCompiledBinExist()) {
@@ -111,6 +111,7 @@ function compile_bin(socket, make_params) {
       if (secsSinceCompiled <= 1) successful = true;
     }
 
+    // TODO: move error messages into terminated-msg
     sendTerminated(socket, 'compile_bin', successful);
     sendErrorMsg(socket, error_collection);
   }

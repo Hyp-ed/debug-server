@@ -16,6 +16,14 @@
 
 4. To **start the server**, go into the `server` sub-directory and type `npm start`
 
+# Updating (git pull & git checkout) the hyped-2020 code called by the debug-server
+
+**The default branch is `develop`**
+
+An option to `git pull` and `git checkout [branch]` through the [mission-control-GUI](https://github.com/Hyp-ed/mission-control-2020-frontend) is on our [Feature wishlist](https://app.clickup.com/t/2ugjg2) but not yet implemented
+
+For the time being, you still have to `ssh` into the BBB, `cd` into `debug-server/hyped-pod_code` and run your `git` commands.
+
 # Valid TCP messages
 
 ## Compiling the binary
@@ -64,7 +72,6 @@ Execute with custom flags and debug-level (default=3):
 **Possible responses:**
 
 - [Console Data](#console-data) -> Parsed lines
-- [Errors](#errors)
 - [Completion](#completion)
 
 ## Stopping execution
@@ -118,7 +125,7 @@ Error messages may be split into multiple TCP messages
     {
         "line": "18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0",
         "time": "18:47:04.393",
-        "debug_mode": "DBG3",
+        "log_type": "DBG3",
         "debug_level": "3",
         "submodule": "Fake-GpioCounter",
         "log": "time_after: 0"
@@ -126,7 +133,7 @@ Error messages may be split into multiple TCP messages
     {
         "line": "18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0",
         "time": "18:47:04.393",
-        "debug_mode": "DBG3",
+        "log_type": "DBG3",
         "debug_level": "3",
         "submodule": "Fake-GpioCounter",
         "log": "time_after: 0"
