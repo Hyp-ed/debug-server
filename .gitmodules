@@ -1,3 +1,4 @@
 [submodule "hyped-pod_code"]
+	branch = develop
 	path = hyped-pod_code
 	url = git@github.com:Hyp-ed/hyped-2020.git
