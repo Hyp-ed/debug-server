@@ -6,7 +6,7 @@
  *
  * Description:   Handles websocket requests and responses using socket.io
  *
- * Last Modified: Monday, 2nd March 2020 8:20:23 pm
+ * Last Modified: Monday, 2nd March 2020 8:34:23 pm
  * Modified By:   Paul Martin
  */
 
@@ -109,6 +109,7 @@ function compile_bin(socket, make_params) {
     if (bbb.doesCompiledBinExist()) {
       const secsSinceCompiled = (new Date() - bbb.binLastModified()) / 1000;
       if (secsSinceCompiled <= 1) successful = true;
+      console.log(successful);
     }
 
     sendTerminated(socket, 'compile_bin', successful, error_collection);
@@ -203,11 +204,11 @@ function sendData(socket, payload) {
   tcpSend(socket, data);
 }
 
-function sendTerminated(socket, taskName, success, payload = '') {
+function sendTerminated(socket, taskName, success = false, payload = '') {
   const data = JSON.stringify({
     msg: 'terminated',
     task: taskName,
-    success: success || true,
+    success: success,
     payload
   });
 
