@@ -4,11 +4,11 @@
  * File Created:  Thursday, 6th February 2020 6:37:09 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Saturday, 8th February 2020 3:39:51 pm
+ * Last Modified: Monday, 2nd March 2020 6:49:26 pm
  * Modified By:   Paul Martin
  */
 
-const parser = require('../src/parser');
+const { ExecParser } = require('../src/parser');
 
 const input1 = `18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0
 18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0
@@ -22,7 +22,7 @@ const output1 = [
   {
     line: '18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.393',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -30,7 +30,7 @@ const output1 = [
   {
     line: '18:47:04.393 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.393',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -38,7 +38,7 @@ const output1 = [
   {
     line: '18:47:04.404 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.404',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -46,7 +46,7 @@ const output1 = [
   {
     line: '18:47:04.404 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.404',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -54,7 +54,7 @@ const output1 = [
   {
     line: '18:47:04.414 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.414',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -62,7 +62,7 @@ const output1 = [
   {
     line: '18:47:04.414 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.414',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -70,7 +70,7 @@ const output1 = [
   {
     line: '18:47:04.427 DBG3[Fake-GpioCounter]: time_after: 0',
     time: '18:47:04.427',
-    debug_mode: 'DBG3',
+    log_type: 'DBG3',
     debug_level: '3',
     submodule: 'Fake-GpioCounter',
     log: 'time_after: 0'
@@ -106,9 +106,9 @@ const input3 = [
 const output3 = output1;
 
 test('Queue & parse simple block', () => {
-  const queue = new parser.Queue();
+  const queue = new ExecParser();
 
-  queue.add(input1);
+  queue.addToQueue(input1);
   expect(queue.countLines()).toBe(8);
 
   const parsedLines = queue.parse();
@@ -117,10 +117,10 @@ test('Queue & parse simple block', () => {
 });
 
 test('Queue & parse multiple line blocks', () => {
-  const queue = new parser.Queue();
+  const queue = new ExecParser();
 
   input2.forEach(line => {
-    queue.add(line);
+    queue.addToQueue(line);
   });
   expect(queue.countLines()).toBe(8);
 
@@ -130,10 +130,10 @@ test('Queue & parse multiple line blocks', () => {
 });
 
 test('Queue & parse split lines', () => {
-  const queue = new parser.Queue();
+  const queue = new ExecParser();
 
   input3.forEach(line => {
-    queue.add(line);
+    queue.addToQueue(line);
   });
   expect(queue.countLines()).toBe(8);
 
