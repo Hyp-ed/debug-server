@@ -16,13 +16,13 @@
 
 4. To **start the server**, go into the `server` sub-directory and type `npm start`
 
-# Updating (git pull & git checkout) the hyped-2020 code called by the debug-server
+# Updating the hyped-2020 submodule _(git pull / git checkout)_
 
-**The default branch is `develop`**
+**The default branch for hyped-2020 is `develop`**
 
-An option to `git pull` and `git checkout [branch]` through the [mission-control-GUI](https://github.com/Hyp-ed/mission-control-2020-frontend) is on our [Feature wishlist](https://app.clickup.com/t/2ugjg2) but not yet implemented
+For the time being, you will have to `ssh` into the BBB, `cd` into `debug-server/hyped-pod_code` and run your `git` commands there.
 
-For the time being, you still have to `ssh` into the BBB, `cd` into `debug-server/hyped-pod_code` and run your `git` commands.
+An option to `git pull` and `git checkout [branch]` through the [mission-control GUI](https://github.com/Hyp-ed/mission-control-2020-frontend) is on our [Feature wishlist](https://app.clickup.com/t/2ugjg2) but not yet implemented.
 
 # Valid TCP messages
 
@@ -85,24 +85,6 @@ Triggers the [Termination](#termination) response of the [binary execution](#exe
 
 # Possible TCP responses
 
-Responses are always broadcasted to all connected clients
-
-## Errors
-
-Error messages may be split into multiple TCP messages
-
-```JSON
-{
-    "msg": "error",
-    "type": <type>,
-    "payload": "error_message"
-}
-```
-
-**Error types:**
-
-- `"server_error"`
-
 ## Console Data
 
 ```JSON
@@ -138,16 +120,30 @@ Error messages may be split into multiple TCP messages
   ]
   ```
 
-- String \
-   _(Possible but not yet implemented)_
+## Errors
+
+Error messages may be split into multiple TCP messages
+
+```JSON
+{
+    "msg": "error",
+    "type": <type>,
+    "payload": "error_message"
+}
+```
+
+**Error types:**
+
+- `"server_error"`
 
 ## Termination
 
 ```JSON
 {
-    "msg": "completed",
+    "msg": "terminated",
     "task": "command_name",
-    "success": true|false
+    "success": <bool>,
+    "payload": "error_message(s)"
 }
 ```
 

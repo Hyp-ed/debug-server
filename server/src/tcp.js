@@ -6,12 +6,11 @@
  *
  * Description:   Handles websocket requests and responses using socket.io
  *
- * Last Modified: Monday, 2nd March 2020 8:34:23 pm
+ * Last Modified: Tuesday, 3rd March 2020 10:45:25 am
  * Modified By:   Paul Martin
  */
 
 const net = require('net');
-const fs = require('fs');
 
 const Bbb = require('./Bbb');
 const Logger = require('./Logger');
