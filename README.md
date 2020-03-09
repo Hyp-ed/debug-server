@@ -2,7 +2,7 @@
 
 - Runs on `nodeJS`
 - Communicates over `TCP`
-- Listens on port `7070`
+- TCP server listens on port `7070`
 
 # Installation & Requirements
 

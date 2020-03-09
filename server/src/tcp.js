@@ -6,7 +6,7 @@
  *
  * Description:   Handles websocket requests and responses using socket.io
  *
- * Last Modified: Tuesday, 3rd March 2020 10:45:25 am
+ * Last Modified: Monday, 9th March 2020 7:43:13 pm
  * Modified By:   Paul Martin
  */
 
@@ -18,6 +18,90 @@ const { ExecParser } = require('./parser');
 const bbb = new Bbb();
 
 const utils = require('./utils');
+
+class SocketWrapper {
+  constructor(sock) {
+    this.socket = sock;
+  }
+
+  // Alias for this.socket.write
+  write(...args) {
+    this.socket.write(...args);
+  }
+
+  send(data) {
+    if (!this.socket.destroyed) {
+      this.write(data + '\n');
+    }
+  }
+
+  sendData(payload) {
+    const data = JSON.stringify({
+      msg: 'console_data',
+      payload: payload
+    });
+
+    this.send(data);
+  }
+
+  sendError(type, errorMessage) {
+    const data = JSON.stringify({
+      msg: 'error',
+      type: type,
+      payload: errorMessage
+    });
+
+    this.send(data);
+  }
+
+  sendTerminated(taskName, success = false, payload = '') {
+    const data = JSON.stringify({
+      msg: 'terminated',
+      task: taskName,
+      success: success,
+      payload
+    });
+
+    this.send(data);
+  }
+
+  handleIncoming(rawData) {
+    console.log(rawData);
+    console.log(this);
+    if (utils.isJsonParsable(rawData)) {
+      const data = JSON.parse(rawData);
+      const msg = data.msg;
+      this.interpretMsg(msg, data);
+    } else {
+      socket_wrapper.write('Not in JSON format\n');
+      console.error('** Could not parse incoming json-data');
+    }
+  }
+
+  interpretMsg(msg, data) {
+    console.log(`Task: ${msg}`);
+    switch (msg) {
+      case 'run_bin':
+        run_bin(this, {
+          flags: data.flags || [],
+          debug_level: data.debug_level || 3
+        });
+        break;
+
+      case 'kill_running_bin':
+        kill_run(this);
+        break;
+
+      case 'compile_bin':
+        compile_bin(this, data.make_params || []);
+        break;
+
+      default:
+        socket.write('Could not interpret json message\n');
+        console.error("Couldn't interpret message");
+    }
+  }
+}
 
 class Sockets {
   socks = [];
@@ -38,7 +122,7 @@ class Sockets {
 }
 const sockets = new Sockets();
 
-function run_bin(socket, payload) {
+function run_bin(socket_wrapper, payload) {
   // if already running binary, don't connect again
   if (bbb.isBusy()) {
     console.log('** System is currently busy');
@@ -46,8 +130,7 @@ function run_bin(socket, payload) {
   }
 
   if (!bbb.doesCompiledBinExist()) {
-    sendErrorMsg(
-      socket,
+    socket_wrapper.sendError(
       'server_error',
       "Couldn't execute the binary. './hyped' does not exist."
     );
@@ -65,13 +148,13 @@ function run_bin(socket, payload) {
     if (parseQueue.countLines() <= 1) return; // Make sure that no incomplete lines are parsed
 
     const parsedLines = parseQueue.parse();
-    sendData(socket, parsedLines);
+    socket_wrapper.sendData(parsedLines);
   }
 
   function exitHandler(data, err) {
     const parsedLines = parseQueue.parseRest();
-    sendData(socket, parsedLines);
-    sendTerminated(socket, 'run_bin', true);
+    socket_wrapper.sendData(parsedLines);
+    socket_wrapper.sendTerminated('run_bin', true);
   }
 
   // Don't differentiate between stdout and stderr
@@ -88,7 +171,7 @@ function run_bin(socket, payload) {
   );
 }
 
-function compile_bin(socket, make_params) {
+function compile_bin(socket_wrapper, make_params) {
   // if already running binary, don't connect again
   if (bbb.isBusy()) {
     console.log('** System is currently busy');
@@ -102,7 +185,6 @@ function compile_bin(socket, make_params) {
   }
 
   function exitHandler(data, err) {
-    // TODO: fix - successful even if not compiled
     // Check if binary was created
     let successful = false;
     if (bbb.doesCompiledBinExist()) {
@@ -111,7 +193,7 @@ function compile_bin(socket, make_params) {
       console.log(successful);
     }
 
-    sendTerminated(socket, 'compile_bin', successful, error_collection);
+    socket_wrapper.sendTerminated('compile_bin', successful, error_collection);
   }
 
   function errorHandler(err) {
@@ -128,47 +210,6 @@ function kill_run() {
   bbb.kill();
 }
 
-/**
- * Interprets the tcp message
- *
- * @param {str} msg - The command to be executed (eg. 'run_bin')
- * @param {*} data - JSON-obj containing parameters for execution of command
- */
-function handleRequest(socket, msg, data) {
-  console.log(`Task: ${msg}`);
-  switch (msg) {
-    case 'run_bin':
-      run_bin(socket, {
-        flags: data.flags || [],
-        debug_level: data.debug_level || 3
-      });
-      break;
-
-    case 'kill_running_bin':
-      kill_run(socket);
-      break;
-
-    case 'compile_bin':
-      compile_bin(socket, data.make_params || []);
-      break;
-
-    default:
-      socket.write('Could not interpret json message\n');
-      console.error("Couldn't interpret message");
-  }
-}
-
-function tcpHandleData(socket, dataRaw) {
-  if (utils.isJsonParsable(dataRaw)) {
-    const data = JSON.parse(dataRaw);
-    const msg = data.msg;
-    handleRequest(socket, msg, data);
-  } else {
-    socket.write('Not in JSON format\n');
-    console.error('** Could not parse incoming json-data');
-  }
-}
-
 function tcpHandleClose() {
   console.log('** Lost connection to client');
 }
@@ -178,49 +219,15 @@ function tcpHandleError(err) {
   else console.log(err);
 }
 
-function tcpSend(socket, data) {
-  if (!socket.destroyed) {
-    socket.write(data + '\n');
-  }
-}
-
-function sendErrorMsg(socket, type, errorMessage) {
-  const data = JSON.stringify({
-    msg: 'error',
-    type: type,
-    payload: errorMessage
-  });
-
-  tcpSend(socket, data);
-}
-
-function sendData(socket, payload) {
-  const data = JSON.stringify({
-    msg: 'console_data',
-    payload: payload
-  });
-
-  tcpSend(socket, data);
-}
-
-function sendTerminated(socket, taskName, success = false, payload = '') {
-  const data = JSON.stringify({
-    msg: 'terminated',
-    task: taskName,
-    success: success,
-    payload
-  });
-
-  tcpSend(socket, data);
-}
-
 function onClientConnected(socket) {
   sockets.add(socket);
+
+  socket_wrapper = new SocketWrapper(socket);
 
   console.log('** New connection');
   socket.setEncoding('utf-8');
 
-  socket.on('data', rawData => tcpHandleData(socket, rawData));
+  socket.on('data', rawData => socket_wrapper.handleIncoming(rawData));
   socket.on('close', () => {
     tcpHandleClose();
     sockets.remove(socket);
