@@ -6,12 +6,13 @@
  *
  * Description:   Entry point for backend
  *
- * Last Modified: Thursday, 27th February 2020 7:15:32 pm
+ * Last Modified: Friday, 27th March 2020 6:52:25 pm
  * Modified By:   Paul Martin
  */
+'use strict';
 
 // start websocket server
-const tcp = require('./src/tcp');
+const tcp = require('./src/tcp/server');
 const tcpServer = new tcp();
 
 tcpServer.open(7070);

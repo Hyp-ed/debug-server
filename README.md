@@ -26,6 +26,31 @@ An option to `git pull` and `git checkout [branch]` through the [mission-control
 
 # Valid TCP messages
 
+## Using SSH
+
+By default the hyped pod code used for compiling and executing the binary is located in the "hyped-pod_code" directory.
+
+If you wish to run the commands not on your local machine but instead remotely via ssh, send the following message to setup the remote connection.
+
+```JSON
+{
+    "msg" : "use_ssh",
+    "host" : "192.168.6.2",
+    "username" : "hyped",
+    "password" : "spacex",
+    "dir" : "~/hyped-2020"
+}
+```
+
+- If a connection already exists, it is closed and overwritten.
+- If the connection fails, the local machine is used.
+
+**Possible responses:**
+
+```JSON
+{ "msg": "ssh_connection", "success": <bool> }
+```
+
 ## Compiling the binary
 
 Only run the `make` command:
@@ -83,6 +108,23 @@ Execute with custom flags and debug-level (default=3):
 
 Triggers the [Termination](#termination) response of the [binary execution](#executing-the-binary)
 
+## Resetting
+
+- Kills all running processes
+- Disconnects ssh
+- Deletes all temporary data (e.g. ssh connection details)
+- _Does not_ disconnect tcp connections. For that a manual restart of the server is required.
+
+```JSON
+{ "msg" : "reset" }
+```
+
+**Possible responses:**
+
+```JSON
+{ "msg": "reset_complete" }
+```
+
 # Possible TCP responses
 
 ## Console Data
@@ -128,7 +170,10 @@ Error messages may be split into multiple TCP messages
 {
     "msg": "error",
     "type": <type>,
-    "payload": "error_message"
+    "payload":  {
+        "message": "error_message",
+        "stack_trace": "if available"
+    }
 }
 ```
 

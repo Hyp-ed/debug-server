@@ -4,9 +4,10 @@
  * File Created:  Saturday, 9th November 2019 1:48:35 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Thursday, 27th February 2020 11:57:01 pm
+ * Last Modified: Friday, 27th March 2020 6:37:51 pm
  * Modified By:   Paul Martin
  */
+'use strict';
 
 const fs = require('fs');
 const path = require('path');

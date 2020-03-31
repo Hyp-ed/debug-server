@@ -4,13 +4,16 @@
  * File Created:  Thursday, 7th November 2019 6:48:08 pm
  * Author(s):     Paul Martin
  *
- * Last Modified: Monday, 2nd March 2020 7:49:41 pm
+ * Last Modified: Tuesday, 31st March 2020 2:21:02 pm
  * Modified By:   Paul Martin
  */
+'use strict';
 
 // A queue is needed because logs can be split in the middle of a line
 class ExecParser {
-  queue = '';
+  constructor() {
+    this.queue = '';
+  }
 
   countLines() {
     return this.queue.split('\n').length;
@@ -24,6 +27,8 @@ class ExecParser {
   }
 
   parseRest() {
+    if (this.queue === '') return '';
+
     const lines = this.queue.split('\n');
     this.queue = [];
     return lines.map(this.parse_line);
